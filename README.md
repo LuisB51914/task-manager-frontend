@@ -25,6 +25,7 @@ pnpm build
 ```
 ## Componentes principales
 - AppHeader
+- AppFooter, que muestra el nombre del curso recibido mediante una propiedad tipada.
 - TaskForm
 - TaskFilters
 - TaskSummary
