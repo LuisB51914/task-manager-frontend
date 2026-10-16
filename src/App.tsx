@@ -1,9 +1,9 @@
 import { AppHeader } from "./components/AppHeader";
-import { AppFooter } from "./components/AppFooter";
 import { TaskFilters } from "./components/TaskFilters";
 import { TaskForm } from "./components/TaskForm";
 import { TaskList } from "./components/TaskList";
 import { TaskSummary } from "./components/TaskSummary";
+import { tasks } from "./data/tasks";
 export default function App() {
   return (
     <div className="app-shell">
@@ -11,10 +11,14 @@ export default function App() {
       <main className="app-main">
         <TaskForm />
         <TaskFilters />
-        <TaskSummary total={3} pending={2} completed={1} />
-        <TaskList />
+        <TaskSummary tasks={tasks} />
+        <TaskList tasks={tasks} />
       </main>
-      <AppFooter courseName="Frontend EC2" />
+      <footer className="app-footer">
+        <div className="app-footer__content">
+          <p>Administrador de tareas - Frontend EC2</p>
+        </div>
+      </footer>
     </div>
   );
 }

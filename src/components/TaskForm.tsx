@@ -11,7 +11,7 @@ export function TaskForm() {
         <label htmlFor="task-title">Título de la tarea</label>
         <div className="task-form__row">
           <input
-            id="task-title"
+            id="task-title" 
             name="title"
             type="text"
             placeholder="Ejemplo: revisar documentación"
