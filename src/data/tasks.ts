@@ -17,7 +17,7 @@ export const tasks: Task[] = [
   {
     id: "task-003",
     title: "Modelar las tareas con TypeScript",
-    status: "completed",
+    status: "pending",
     createdAt: "2026-09-24T16:00:00.000Z",
     updatedAt: "2026-09-24T16:00:00.000Z",
   },
