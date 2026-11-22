@@ -1,0 +1,410 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/App.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/main.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'vite.config.ts', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 5ab8865..693ef36 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -1,27 +1,31 @@[m
+ # Administrador de tareas Frontend[m
+ [m
+[31m-Aplicación desarrollada con React, TypeScript,[m
+[31m-Vite, React Router y PNPM.[m
+[32m+[m[32mSPA desarrollada con React, TypeScript, Vite,[m
+[32m+[m[32mReact Router y Fetch API.[m
+ [m
+ ## Funciones actuales[m
+ [m
+[31m-- Navegación SPA.[m
+[31m-- Página de inicio.[m
+[31m-- Administración de tareas.[m
+[31m-- Detalle mediante una ruta dinámica.[m
+[31m-- Página 404.[m
+[31m-- Operaciones CRUD.[m
+[31m-- Validación de títulos.[m
+[31m-- Búsqueda, filtros y ordenamiento.[m
+[31m-- Persistencia mediante localStorage.[m
+[31m-- Interfaz adaptable.[m
+[32m+[m[32m- Registro e inicio de sesión.[m
+[32m+[m[32m- Restauración de identidad con /api/auth/me.[m
+[32m+[m[32m- Rutas públicas y protegidas.[m
+[32m+[m[32m- CRUD remoto de tareas.[m
+[32m+[m[32m- Búsqueda, filtros, ordenamiento y paginación.[m
+[32m+[m[32m- Eliminación disponible para admin.[m
+[32m+[m[32m- Manejo de carga, vacío, error, 401 y 403.[m
+ [m
+ ## Rutas[m
+ [m
+ - `/`[m
+[31m-- `/tasks`[m
+[31m-- `/tasks/:taskId`[m
+[31m-- `*`[m
+[32m+[m[32m- `/login`[m
+[32m+[m[32m- `/register`[m
+[32m+[m[32m- `/tasks` protegida[m
+[32m+[m[32m- `/tasks/:taskId` protegida[m
+[32m+[m
+[32m+[m[32m## Variables[m
+[32m+[m
+[32m+[m[32m```envVITE_API_URL=/api[m
+[32m+[m
+[32m+[m[32m```[m
+ [m
+ ## Ejecución[m
+ [m
+[36m@@ -30,14 +34,19 @@[m [mpnpm install[m
+ pnpm dev[m
+ ```[m
+ [m
+[31m-## Validación técnica[m
+[32m+[m[32mLa API debe ejecutarse en el puerto configurado por[m
+[32m+[m[32mel proxy de Vite.[m
+[32m+[m
+[32m+[m[32m## Seguridad didáctica[m
+[32m+[m
+[32m+[m[32mEl access token se conserva en sessionStorage para[m
+[32m+[m[32mpracticar restauración dentro de la pestaña. No se[m
+[32m+[m[32malmacenan contraseñas ni se imprimen tokens. La API[m
+[32m+[m[32mmantiene la autenticación y autorización reales.[m
+[32m+[m
+[32m+[m[32m## Validación[m
+ [m
+ ```bash[m
+ pnpm lint[m
+ pnpm build[m
+ ```[m
+[31m-[m
+[31m-## Alcance[m
+[31m-[m
+[31m-Esta versión utiliza almacenamiento local.[m
+[31m-La API REST se integrará en la Actividad 10.[m
+[1mdiff --git a/src/App.tsx b/src/App.tsx[m
+[1mindex 186c281..21da08e 100644[m
+[1m--- a/src/App.tsx[m
+[1m+++ b/src/App.tsx[m
+[36m@@ -1,122 +1,26 @@[m
+[31m-import { useEffect, useState } from "react";[m
+ import { Route, Routes } from "react-router";[m
+[31m-import { tasks as initialTasks } from "./data/tasks";[m
+ import { AppLayout } from "./layouts/AppLayout";[m
+[31m-import type { Task } from "./models/task.interface";[m
+[31m-import type { TaskFilter, TaskSort } from "./models/task-view.types";[m
+ import { HomePage } from "./pages/HomePage";[m
+[32m+[m[32mimport { LoginPage } from "./pages/LoginPage";[m
+ import { NotFoundPage } from "./pages/NotFoundPage";[m
+[32m+[m[32mimport { RegisterPage } from "./pages/RegisterPage";[m
+ import { TaskDetailPage } from "./pages/TaskDetailPage";[m
+ import { TasksPage } from "./pages/TasksPage";[m
+[31m-import { getVisibleTasks } from "./services/task-query.service";[m
+[31m-import { loadTasks, saveTasks } from "./services/task-storage.service";[m
+[32m+[m[32mimport { ProtectedRoute } from "./routes/ProtectedRoute";[m
+[32m+[m[32mimport { PublicOnlyRoute } from "./routes/PublicOnlyRoute";[m
+ export default function App() {[m
+[31m-  const [tasks, setTasks] = useState<Task[]>(() => loadTasks(initialTasks));[m
+[31m-  const [query, setQuery] = useState("");[m
+[31m-  const [filter, setFilter] = useState<TaskFilter>("all");[m
+[31m-  const [sortBy, setSortBy] = useState<TaskSort>("updated-desc");[m
+[31m-  useEffect(() => {[m
+[31m-    saveTasks(tasks);[m
+[31m-  }, [tasks]);[m
+[31m-  const visibleTasks = getVisibleTasks(tasks, {[m
+[31m-    query,[m
+[31m-    filter,[m
+[31m-    sortBy,[m
+[31m-  });[m
+[31m-  const hasActiveCriteria = query.trim() !== "" || filter !== "all";[m
+[31m-  const emptyMessage = hasActiveCriteria[m
+[31m-    ? "No hay tareas que coincidan con la búsqueda y el filtro."[m
+[31m-    : "Utiliza el formulario para registrar una nueva actividad.";[m
+[31m-  function handleAddTask(title: string): void {[m
+[31m-    const now = new Date().toISOString();[m
+[31m-    const newTask: Task = {[m
+[31m-      id: crypto.randomUUID(),[m
+[31m-      title,[m
+[31m-      status: "pending",[m
+[31m-      createdAt: now,[m
+[31m-      updatedAt: now,[m
+[31m-    };[m
+[31m-    setTasks((currentTasks) => [newTask, ...currentTasks]);[m
+[31m-  }[m
+[31m-  function handleToggleStatus(id: string): void {[m
+[31m-    const now = new Date().toISOString();[m
+[31m-    setTasks((currentTasks) =>[m
+[31m-      currentTasks.map((task) => {[m
+[31m-        if (task.id !== id) {[m
+[31m-          return task;[m
+[31m-        }[m
+[31m-        return {[m
+[31m-          ...task,[m
+[31m-          status: task.status === "pending" ? "completed" : "pending",[m
+[31m-          updatedAt: now,[m
+[31m-        };[m
+[31m-      }),[m
+[31m-    );[m
+[31m-  }[m
+[31m-  function handleEditTask(id: string, title: string): void {[m
+[31m-    const now = new Date().toISOString();[m
+[31m-    setTasks((currentTasks) =>[m
+[31m-      currentTasks.map((task) =>[m
+[31m-        task.id === id[m
+[31m-          ? {[m
+[31m-              ...task,[m
+[31m-              title,[m
+[31m-              updatedAt: now,[m
+[31m-            }[m
+[31m-          : task,[m
+[31m-      ),[m
+[31m-    );[m
+[31m-  }[m
+[31m-  function handleDeleteTask(id: string): boolean {[m
+[31m-    const selectedTask = tasks.find((task) => task.id === id);[m
+[31m-    if (!selectedTask) {[m
+[31m-      return false;[m
+[31m-    }[m
+[31m-    const shouldDelete = window.confirm([m
+[31m-      `¿Eliminar la tarea "${selectedTask.title}"?`,[m
+[31m-    );[m
+[31m-    if (!shouldDelete) {[m
+[31m-      return false;[m
+[31m-    }[m
+[31m-    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));[m
+[31m-    return true;[m
+[31m-  }[m
+[31m-  function handleClearCriteria(): void {[m
+[31m-    setQuery("");[m
+[31m-    setFilter("all");[m
+[31m-    setSortBy("updated-desc");[m
+[31m-  }[m
+   return ([m
+     <Routes>[m
+       <Route element={<AppLayout />}>[m
+[31m-        <Route index element={<HomePage tasks={tasks} />} />[m
+[31m-        <Route[m
+[31m-          path="tasks"[m
+[31m-          element={[m
+[31m-            <TasksPage[m
+[31m-              tasks={tasks}[m
+[31m-              visibleTasks={visibleTasks}[m
+[31m-              query={query}[m
+[31m-              filter={filter}[m
+[31m-              sortBy={sortBy}[m
+[31m-              emptyMessage={emptyMessage}[m
+[31m-              onAddTask={handleAddTask}[m
+[31m-              onQueryChange={setQuery}[m
+[31m-              onFilterChange={setFilter}[m
+[31m-              onSortChange={setSortBy}[m
+[31m-              onClearCriteria={handleClearCriteria}[m
+[31m-              onToggleStatus={handleToggleStatus}[m
+[31m-              onEditTask={handleEditTask}[m
+[31m-              onDeleteTask={handleDeleteTask}[m
+[31m-            />[m
+[31m-          }[m
+[31m-        />[m
+[31m-        <Route[m
+[31m-          path="tasks/:taskId"[m
+[31m-          element={[m
+[31m-            <TaskDetailPage tasks={tasks} onDeleteTask={handleDeleteTask} />[m
+[31m-          }[m
+[31m-        />[m
+[32m+[m[32m        <Route index element={<HomePage />} />[m
+[32m+[m[32m        <Route element={<PublicOnlyRoute />}>[m
+[32m+[m[32m          <Route path="login" element={<LoginPage />} />[m
+[32m+[m[32m          <Route path="register" element={<RegisterPage />} />[m
+[32m+[m[32m        </Route>[m
+[32m+[m[32m        <Route element={<ProtectedRoute />}>[m
+[32m+[m[32m          <Route path="tasks" element={<TasksPage />} />[m
+[32m+[m[32m          <Route path="tasks/:taskId" element={<TaskDetailPage />} />[m
+[32m+[m[32m        </Route>[m
+         <Route path="*" element={<NotFoundPage />} />[m
+       </Route>[m
+     </Routes>[m
+[1mdiff --git a/src/components/AppNavigation.tsx b/src/components/AppNavigation.tsx[m
+[1mindex 6fe0781..5696a19 100644[m
+[1m--- a/src/components/AppNavigation.tsx[m
+[1m+++ b/src/components/AppNavigation.tsx[m
+[36m@@ -1,40 +1,62 @@[m
+[31m-import { NavLink } from "react-router";[m
+[32m+[m[32mimport { NavLink, useNavigate } from "react-router";[m
+[32m+[m[32mimport { useAuth } from "../hooks/useAuth";[m
+[32m+[m[32mfunction linkClass({ isActive }: { isActive: boolean }): string {[m
+[32m+[m[32m  return [[m
+[32m+[m[32m    "app-navigation__link",[m
+[32m+[m[32m    isActive ? "app-navigation__link--active" : "",[m
+[32m+[m[32m  ][m
+[32m+[m[32m    .filter(Boolean)[m
+[32m+[m[32m    .join(" ");[m
+[32m+[m[32m}[m
+ export function AppNavigation() {[m
+[32m+[m[32m  const navigate = useNavigate();[m
+[32m+[m[32m  const { status, user, logout } = useAuth();[m
+[32m+[m[32m  const isAuthenticated = status === "authenticated" && user;[m
+[32m+[m[32m  function handleLogout(): void {[m
+[32m+[m[32m    logout();[m
+[32m+[m[32m    navigate("/login", { replace: true });[m
+[32m+[m[32m  }[m
+   return ([m
+[31m-    <nav className="app-navigation" aria-label="Navegación principal">[m
+[31m-      <ul className="app-navigation__list">[m
+[31m-        <li>[m
+[31m-          <NavLink[m
+[31m-            to="/"[m
+[31m-            end[m
+[31m-            className={({ isActive }) =>[m
+[31m-              [[m
+[31m-                "app-navigation__link",[m
+[31m-                isActive ? "app-navigation__link--active" : "",[m
+[31m-              ][m
+[31m-                .filter(Boolean)[m
+[31m-                .join(" ")[m
+[31m-            }[m
+[31m-          >[m
+[31m-            Inicio[m
+[31m-          </NavLink>[m
+[31m-        </li>[m
+[31m-        <li>[m
+[31m-          <NavLink[m
+[31m-            to="/tasks"[m
+[31m-            className={({ isActive }) =>[m
+[31m-              [[m
+[31m-                "app-navigation__link",[m
+[31m-                isActive ? "app-navigation__link--active" : "",[m
+[31m-              ][m
+[31m-                .filter(Boolean)[m
+[31m-                .join(" ")[m
+[31m-            }[m
+[31m-          >[m
+[31m-            Tareas[m
+[31m-          </NavLink>[m
+[31m-        </li>[m
+[31m-      </ul>[m
+[31m-    </nav>[m
+[32m+[m[32m    <div className="app-navigation-bar">[m
+[32m+[m[32m      <nav className="app-navigation" aria-label="Navegación principal">[m
+[32m+[m[32m        <ul className="app-navigation__list">[m
+[32m+[m[32m          <li>[m
+[32m+[m[32m            <NavLink to="/" end className={linkClass}>[m
+[32m+[m[32m              Inicio[m
+[32m+[m[32m            </NavLink>[m
+[32m+[m[32m          </li>[m
+[32m+[m[32m          {isAuthenticated ? ([m
+[32m+[m[32m            <li>[m
+[32m+[m[32m              <NavLink to="/tasks" className={linkClass}>[m
+[32m+[m[32m                Tareas[m
+[32m+[m[32m              </NavLink>[m
+[32m+[m[32m            </li>[m
+[32m+[m[32m          ) : ([m
+[32m+[m[32m            <>[m
+[32m+[m[32m              <li>[m
+[32m+[m[32m                <NavLink to="/login" className={linkClass}>[m
+[32m+[m[32m                  Iniciar sesión[m
+[32m+[m[32m                </NavLink>[m
+[32m+[m[32m              </li>[m
+[32m+[m[32m              <li>[m
+[32m+[m[32m                <NavLink to="/register" className={linkClass}>[m
+[32m+[m[32m                  Crear cuenta[m
+[32m+[m[32m                </NavLink>[m
+[32m+[m[32m              </li>[m
+[32m+[m[32m            </>[m
+[32m+[m[32m          )}[m
+[32m+[m[32m        </ul>[m
+[32m+[m[32m      </nav>[m
+[32m+[m[32m      {isAuthenticated && ([m
+[32m+[m[32m        <div className="session-summary">[m
+[32m+[m[32m          <span>[m
+[32m+[m[32m            {user.name} · {user.role}[m
+[32m+[m[32m          </span>[m
+[32m+[m[32m          <button type="button" onClick={handleLogout}>[m
+[32m+[m[32m            Cerrar sesión[m
+[32m+[m[32m          </button>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m      )}[m
+[32m+[m[32m    </div>[m
+   );[m
+ }[m
+[1mdiff --git a/src/components/TaskFilters.tsx b/src/components/TaskFilters.tsx[m
+[1mindex d841389..d5ef287 100644[m
+[1m--- a/src/components/TaskFilters.tsx[m
+[1m+++ b/src/components/TaskFilters.tsx[m
+[36m@@ -1,53 +1,42 @@[m
+ import type { TaskFilter, TaskSort } from "../models/task-view.types";[m
+[31m-[m
+ interface TaskFiltersProps {[m
+   query: string;[m
+   filter: TaskFilter;[m
+   sortBy: TaskSort;[m
+   resultCount: number;[m
+[32m+[m[32m  isLoading: boolean;[m
+   onQueryChange: (value: string) => void;[m
+   onFilterChange: (value: TaskFilter) => void;[m
+   onSortChange: (value: TaskSort) => void;[m
+   onClear: () => void;[m
+ }[m
+[31m-[m
+ export function TaskFilters({[m
+   query,[m
+   filter,[m
+   sortBy,[m
+   resultCount,[m
+[32m+[m[32m  isLoading,[m
+   onQueryChange,[m
+   onFilterChange,[m
+   onSortChange,[m
+   onClear,[m
+ }: TaskFiltersProps) {[m
+[31m-  const hasActiveCriteria =[m
+[31m-    query.trim() !== "" || filter !== "all" || sortBy !== "updated-desc";[m
+[31m-  const resultLabel =[m
+[31m-    resultCount === 1[m
+[31m-      ? "1 resultado visible."[m
+[31m-      : `${resultCount} resultados visibles.`;[m
+[31m-[m
+   return ([m
+[31m-    <section className="panel" aria-labelledby="task-filters-title">[m
+[31m-      <div className="section-heading">[m
+[31m-        <div>[m
+[31m-          <p className="section-heading__eyebrow">Consulta</p>[m
+[31m-          <h2 id="task-filters-title">Buscar y organizar</h2>[m
+[31m-        </div>[m
+[31m-      </div>[m
+[31m-      <div className="filters-grid">[m
+[31m-        <label className="filter-field">[m
+[31m-          <span>Buscar por título</span>[m
+[32m+[m[32m    <section className="task-filters" aria-labelledby="filters-title">[m
+[32m+[m[32m      <h3 id="filters-title">Consultar tareas</h3>[m
+[32m+[m[32m      <div className="task-filters__grid">[m
+[32m+[m[32m        <label>[m
+[32m+[m[32m          Buscar[m
+           <input[m
+             type="search"[m
+             value={query}[m
+[31m-            placeholder="Ejemplo: documentación"[m
+[32m+[m[32m            maxLength={60}[m
+[32m+[m[32m            placeholder="Ejemplo: preparar"[m
+             onChange={(event) => onQueryChange(event.target.value)}[m
+           />[m
+         </label>[m
+[31m-        <label className="filter-field">[m
+[31m-          <span>Estado</span>[m
+[32m+[m[32m        <label>[m
+[32m+[m[32m          Estado[m
+           <select[m
+             value={filter}[m
+             onChange={(event) =>[m
+[36m@@ -59,28 +48,29 @@[m [mexport function TaskFilters({[m
+             <option value="completed">Completadas</option>[m
+           </select>[m
+         </label>[m
+[31m-        <label className="filter-field">[m
+[31m-          <span>Ordenar por</span>[m
+[32m+[m[32m        <label>[m
+[32m+[m[32m          Orden[m
+           <select[m
+             value={sortBy}[m
+             onChange={(event) => onSortChange(event.target.value as TaskSort)}[m
+           >[m
+[31m-            <option value="updated-desc">Actualización reciente</option>[m
+[31m-            <option value="created-desc">Creación reciente</option>[m
+[31m-            <option value="title-asc">Título A a Z</option>[m
+[32m+[m[32m            <option value="updated-desc">Actualizadas recientemente</option>[m
+[32m+[m[32m  

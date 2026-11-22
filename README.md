@@ -1,27 +1,31 @@
 # Administrador de tareas Frontend
 
-Aplicación desarrollada con React, TypeScript,
-Vite, React Router y PNPM.
+SPA desarrollada con React, TypeScript, Vite,
+React Router y Fetch API.
 
 ## Funciones actuales
 
-- Navegación SPA.
-- Página de inicio.
-- Administración de tareas.
-- Detalle mediante una ruta dinámica.
-- Página 404.
-- Operaciones CRUD.
-- Validación de títulos.
-- Búsqueda, filtros y ordenamiento.
-- Persistencia mediante localStorage.
-- Interfaz adaptable.
+- Registro e inicio de sesión.
+- Restauración de identidad con /api/auth/me.
+- Rutas públicas y protegidas.
+- CRUD remoto de tareas.
+- Búsqueda, filtros, ordenamiento y paginación.
+- Eliminación disponible para admin.
+- Manejo de carga, vacío, error, 401 y 403.
 
 ## Rutas
 
 - `/`
-- `/tasks`
-- `/tasks/:taskId`
-- `*`
+- `/login`
+- `/register`
+- `/tasks` protegida
+- `/tasks/:taskId` protegida
+
+## Variables
+
+```envVITE_API_URL=/api
+
+```
 
 ## Ejecución
 
@@ -30,14 +34,19 @@ pnpm install
 pnpm dev
 ```
 
-## Validación técnica
+La API debe ejecutarse en el puerto configurado por
+el proxy de Vite.
+
+## Seguridad didáctica
+
+El access token se conserva en sessionStorage para
+practicar restauración dentro de la pestaña. No se
+almacenan contraseñas ni se imprimen tokens. La API
+mantiene la autenticación y autorización reales.
+
+## Validación
 
 ```bash
 pnpm lint
 pnpm build
 ```
-
-## Alcance
-
-Esta versión utiliza almacenamiento local.
-La API REST se integrará en la Actividad 10.
