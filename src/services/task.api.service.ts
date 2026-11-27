@@ -30,7 +30,7 @@ export function listTasks(
   signal?: AbortSignal,
 ): Promise<TaskListResponse> {
   return httpRequest<TaskListResponse>(
-    `/api/tasks?${createQueryString(query)}`,
+    `/tasks?${createQueryString(query)}`,
     { signal },
     accessToken,
   );
@@ -41,7 +41,7 @@ export function getTaskById(
   signal?: AbortSignal,
 ): Promise<ApiDataResponse<Task>> {
   return httpRequest<ApiDataResponse<Task>>(
-    `/api/tasks/${encodeURIComponent(id)}`,
+    `/tasks/${encodeURIComponent(id)}`,
     { signal },
     accessToken,
   );
@@ -51,7 +51,7 @@ export function createTask(
   accessToken: string,
 ): Promise<ApiDataResponse<Task>> {
   return httpRequest<ApiDataResponse<Task>>(
-    "/api/tasks",
+    "/tasks",
     { method: "POST", body: JSON.stringify(input) },
     accessToken,
   );
@@ -62,7 +62,7 @@ export function updateTask(
   accessToken: string,
 ): Promise<ApiDataResponse<Task>> {
   return httpRequest<ApiDataResponse<Task>>(
-    `/api/tasks/${encodeURIComponent(id)}`,
+    `/tasks/${encodeURIComponent(id)}`,
     {
       method: "PATCH",
       body: JSON.stringify(input),
@@ -72,7 +72,7 @@ export function updateTask(
 }
 export function deleteTask(id: string, accessToken: string): Promise<void> {
   return httpRequest<void>(
-    `/api/tasks/${encodeURIComponent(id)}`,
+    `/tasks/${encodeURIComponent(id)}`,
     { method: "DELETE" },
     accessToken,
   );

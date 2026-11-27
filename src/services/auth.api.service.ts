@@ -10,7 +10,7 @@ import { httpRequest } from "./http.service";
 export function registerUser(
   credentials: RegisterCredentials,
 ): Promise<ApiDataResponse<RegisterData>> {
-  return httpRequest<ApiDataResponse<RegisterData>>("/api/auth/register", {
+  return httpRequest<ApiDataResponse<RegisterData>>("/auth/register", {
     method: "POST",
     body: JSON.stringify(credentials),
   });
@@ -18,7 +18,7 @@ export function registerUser(
 export function loginUser(
   credentials: LoginCredentials,
 ): Promise<ApiDataResponse<LoginData>> {
-  return httpRequest<ApiDataResponse<LoginData>>("/api/auth/login", {
+  return httpRequest<ApiDataResponse<LoginData>>("/auth/login", {
     method: "POST",
     body: JSON.stringify(credentials),
   });
@@ -28,7 +28,7 @@ export function getAuthenticatedUser(
   signal?: AbortSignal,
 ): Promise<ApiDataResponse<MeData>> {
   return httpRequest<ApiDataResponse<MeData>>(
-    "/api/auth/me",
+    "/auth/me",
     { signal },
     accessToken,
   );
